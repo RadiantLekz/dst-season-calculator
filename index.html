@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DST · Season Calculator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&family=Inter:wght@400;500&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #faf9f6;
+            color: #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+            transition: background 0.2s, color 0.2s;
+            line-height: 1.5;
+        }
+        body.dark {
+            background: #0f0f0f;
+            color: #e0dcd5;
+        }
+        .card {
+            max-width: 560px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e0dcd5;
+            transition: background 0.2s, border-color 0.2s;
+            overflow: hidden;
+        }
+        body.dark .card {
+            background: #1a1a1a;
+            border-color: #2a2a2a;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        /* BANNER SUPERIOR CON FONDO DST */
+        .header-banner {
+            background: #2d281c url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 L 90 10 L 90 90 L 10 90 Z" fill="none" stroke="%234a3f2a" stroke-width="0.8" opacity="0.3"/><path d="M20 30 Q 40 20 60 30 T 90 20" stroke="%23655a3a" fill="none" stroke-width="1.2" opacity="0.2"/><circle cx="25" cy="70" r="3" fill="%23655a3a" opacity="0.15"/><circle cx="75" cy="45" r="5" fill="%23655a3a" opacity="0.1"/></svg>');
+            background-size: 120px;
+            background-color: #3a3222;
+            padding: 22px 28px 18px 28px;
+            border-bottom: 2px solid #5c4e33;
+            position: relative;
+        }
+        body.dark .header-banner {
+            background-color: #1f1a12;
+            border-bottom-color: #4a3f2a;
+        }
+        .header-banner::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #8b7340, #c9a84c, #8b7340);
+            opacity: 0.4;
+        }
+        .title-font {
+            font-family: 'Crimson Text', 'Times New Roman', serif;
+            font-weight: 600;
+            color: #efe6d2;
+            text-shadow: 2px 2px 0 #1f1a12;
+            letter-spacing: 0.5px;
+            font-size: 1.8rem;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+        body.dark .title-font {
+            color: #f0e7d6;
+            text-shadow: 2px 2px 0 #0a0804;
+        }
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .lang-theme-group {
+            display: flex;
+            gap: 6px;
+        }
+        .header-btn {
+            background: rgba(30, 25, 15, 0.6);
+            backdrop-filter: blur(2px);
+            border: 1px solid #b89f6a;
+            color: #f0e7d6;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+        .header-btn:hover {
+            background: #5c4e33;
+            border-color: #e0c484;
+        }
+        
+        /* CONTENIDO PRINCIPAL */
+        .content-panel {
+            padding: 28px 28px 24px;
+        }
+        
+        /* AVISO DE CONFIGURACION POR DEFECTO */
+        .warning-banner {
+            background: #fdf8e7;
+            border-left: 4px solid #d4a017;
+            padding: 10px 14px;
+            margin-bottom: 22px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #5c4a1e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        body.dark .warning-banner {
+            background: #2a2416;
+            border-left-color: #c9a84c;
+            color: #e0d5b7;
+        }
+        
+        .subhead {
+            font-size: 0.85rem;
+            opacity: 0.55;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 14px;
+        }
+        body.dark .subhead {
+            border-bottom-color: #3a3a3a;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+        input {
+            flex: 1;
+            background: #ffffff;
+            border: 1.5px solid #d4cdc0;
+            padding: 16px 20px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            border-radius: 60px;
+            color: #1e1e1e;
+            outline: none;
+            transition: border 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        body.dark input {
+            background: #2a2824;
+            border-color: #554e42;
+            color: #f0e7d6;
+        }
+        input:focus {
+            border-color: #7a6a4b;
+        }
+        input::placeholder {
+            opacity: 0.4;
+            font-weight: 400;
+            font-size: 1rem;
+        }
+        .calc-btn {
+            background: #3a3222;
+            border: none;
+            color: #efe0c6;
+            font-weight: 500;
+            padding: 0 28px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: 1px solid #6b5d44;
+            font-family: 'Inter', sans-serif;
+        }
+        body.dark .calc-btn {
+            background: #4a3f2a;
+            color: #f2e5d2;
+            border-color: #7a6a4b;
+        }
+        .calc-btn:hover {
+            background: #5c4e33;
+        }
+        
+        /* INFO ESTACION */
+        .season-primary {
+            margin-bottom: 20px;
+        }
+        .main-season {
+            font-size: 2.4rem;
+            font-weight: 500;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 4px;
+            color: #2d281c;
+        }
+        body.dark .main-season {
+            color: #e6d9c2;
+        }
+        .day-fraction {
+            font-size: 1.6rem;
+            opacity: 0.8;
+        }
+        .year-secondary {
+            font-size: 1rem;
+            opacity: 0.55;
+            margin-left: 6px;
+            font-weight: 400;
+        }
+        
+        /* BARRA DE PROGRESO */
+        .progress-container {
+            margin: 16px 0 20px;
+        }
+        .progress-bar-bg {
+            background: #5e2e2e;
+            height: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+        body.dark .progress-bar-bg {
+            background: #3d1e1e;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #3d7a3d;
+            width: 0%;
+            transition: width 0.25s ease;
+            border-radius: 20px;
+            box-shadow: 0 0 6px #6ab04c;
+        }
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+        .days-left-highlight {
+            color: #b34e4e;
+            font-weight: 500;
+        }
+        body.dark .days-left-highlight {
+            color: #d47a7a;
+        }
+        
+        /* PROXIMAS ESTACIONES */
+        .next-label {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin: 28px 0 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .next-station-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e6ddd2;
+        }
+        body.dark .next-station-row {
+            border-bottom-color: #2c2822;
+        }
+        .next-station-row:last-child {
+            border-bottom: none;
+        }
+        .station-name {
+            font-weight: 500;
+        }
+        .global-day {
+            font-family: 'SF Mono', 'Menlo', monospace;
+            opacity: 0.7;
+        }
+        
+        /* ESTADO VACIO */
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            opacity: 0.5;
+            font-style: italic;
+        }
+        
+        /* FOOTER */
+        .footer-tools {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 28px;
+            padding-top: 8px;
+        }
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #c9bcab;
+            color: inherit;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        body.dark .copy-btn {
+            border-color: #4a4238;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header-banner">
+        <div class="header-controls">
+            <div class="title-font" id="mainTitle">Don't Starve Together · Calculador</div>
+            <div class="lang-theme-group">
+                <button class="header-btn" id="langToggle">EN</button>
+                <button class="header-btn" id="themeToggle">🌙</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-panel">
+        <!-- AVISO DE CONFIGURACION POR DEFECTO -->
+        <div class="warning-banner" id="warningMsg">
+            <span>⚠️</span>
+            <span id="warningText">Solo válido para configuración por defecto (Otoño 20, Invierno 15, Primavera 20, Verano 15)</span>
+        </div>
+        
+        <div class="subhead" id="cycleDesc">Otoño 20 · Invierno 15 · Primavera 20 · Verano 15</div>
+    
+        <div class="input-row">
+            <input type="number" id="dayInput" placeholder="Día" min="1" inputmode="numeric">
+            <button class="calc-btn" id="calcBtn">→</button>
+        </div>
+    
+        <div id="resultDisplay" class="info-panel">
+            <div class="empty-state" id="emptyStateMsg">Introduce un día para comenzar</div>
+        </div>
+    
+        <div class="footer-tools">
+            <button class="copy-btn" id="copyLinkBtn">📋 Copiar enlace</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        "use strict";
+
+        const CYCLE = [
+            { es: 'Otoño',     en: 'Autumn',   days: 20, emoji: '🍂' },
+            { es: 'Invierno',  en: 'Winter',   days: 15, emoji: '❄️' },
+            { es: 'Primavera', en: 'Spring',   days: 20, emoji: '🌸' },
+            { es: 'Verano',    en: 'Summer',   days: 15, emoji: '☀️' }
+        ];
+        const YEAR_DAYS = 70;
+
+        let currentLang = 'es';
+        
+        const i18n = {
+            es: {
+                title: 'Don\'t Starve Together · Calculador',
+                warning: 'Solo válido para configuración por defecto (Otoño 20, Invierno 15, Primavera 20, Verano 15)',
+                cycle: 'Otoño 20 · Invierno 15 · Primavera 20 · Verano 15',
+                year: 'Año',
+                day: 'Día',
+                daysLeft: 'días para',
+                progressLabel: 'Progreso de estación',
+                nextLabel: 'Próximas estaciones',
+                copyBtn: '📋 Copiar enlace',
+                dayPrefix: 'Día',
+                emptyState: 'Introduce un día para comenzar',
+                placeholder: 'Día'
+            },
+            en: {
+                title: 'Don\'t Starve Together · Calculator',
+                warning: 'Only valid for default configuration (Autumn 20, Winter 15, Spring 20, Summer 15)',
+                cycle: 'Autumn 20 · Winter 15 · Spring 20 · Summer 15',
+                year: 'Year',
+                day: 'Day',
+                daysLeft: 'days until',
+                progressLabel: 'Season progress',
+                nextLabel: 'Upcoming seasons',
+                copyBtn: '📋 Copy link',
+                dayPrefix: 'Day',
+                emptyState: 'Enter a day to begin',
+                placeholder: 'Day'
+            }
+        };
+
+        const dayInput = document.getElementById('dayInput');
+        const calcBtn = document.getElementById('calcBtn');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const themeToggle = document.getElementById('themeToggle');
+        const langToggle = document.getElementById('langToggle');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const mainTitle = document.getElementById('mainTitle');
+        const cycleDesc = document.getElementById('cycleDesc');
+        const warningText = document.getElementById('warningText');
+        const bodyEl = document.body;
+
+        function computeSeason(day) {
+            if (day < 1) day = 1;
+            const year = Math.floor((day - 1) / YEAR_DAYS) + 1;
+            const offset = (day - 1) % YEAR_DAYS;
+            
+            let idx = 0, dayInSeason = 0, accum = 0;
+            for (let i = 0; i < CYCLE.length; i++) {
+                if (offset < accum + CYCLE[i].days) {
+                    idx = i;
+                    dayInSeason = offset - accum + 1;
+                    break;
+                }
+                accum += CYCLE[i].days;
+            }
+            
+            const current = CYCLE[idx];
+            const daysLeft = current.days - dayInSeason;
+            const nextIdx = (idx + 1) % 4;
+            const nextSeasonStartDay = day + daysLeft + 1;
+            
+            const upcoming = [];
+            let cursorDay = nextSeasonStartDay;
+            let cursorIdx = nextIdx;
+            for (let i = 0; i < 3; i++) {
+                upcoming.push({
+                    nameEs: CYCLE[cursorIdx].es,
+                    nameEn: CYCLE[cursorIdx].en,
+                    emoji: CYCLE[cursorIdx].emoji,
+                    startDay: cursorDay
+                });
+                cursorDay += CYCLE[cursorIdx].days;
+                cursorIdx = (cursorIdx + 1) % 4;
+            }
+            
+            return {
+                year, currentNameEs: current.es, currentNameEn: current.en,
+                currentEmoji: current.emoji, dayInSeason, totalSeasonDays: current.days,
+                daysLeft, nextSeasonNameEs: CYCLE[nextIdx].es, nextSeasonNameEn: CYCLE[nextIdx].en,
+                nextSeasonEmoji: CYCLE[nextIdx].emoji, nextSeasonStartDay,
+                progress: (dayInSeason / current.days) * 100, upcoming
+            };
+        }
+
+        function render(day) {
+            if (!day || isNaN(day) || day < 1) {
+                const t = i18n[currentLang];
+                resultDisplay.innerHTML = `<div class="empty-state">${t.emptyState}</div>`;
+                return;
+            }
+            
+            const data = computeSeason(day);
+            const t = i18n[currentLang];
+            const seasonCurrentName = currentLang === 'es' ? data.currentNameEs : data.currentNameEn;
+            const nextSeasonName = currentLang === 'es' ? data.nextSeasonNameEs : data.nextSeasonNameEn;
+            
+            let upcomingHtml = '';
+            data.upcoming.forEach(item => {
+                const name = currentLang === 'es' ? item.nameEs : item.nameEn;
+                upcomingHtml += `<div class="next-station-row"><span class="station-name">${item.emoji} ${name}</span><span class="global-day">${t.dayPrefix} ${item.startDay}</span></div>`;
+            });
+            
+            const html = `
+                <div class="season-primary">
+                    <div class="main-season">
+                        ${data.currentEmoji} ${seasonCurrentName}
+                        <span class="day-fraction">${data.dayInSeason}/${data.totalSeasonDays}</span>
+                        <span class="year-secondary">— ${t.year} ${data.year}</span>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: ${data.progress}%;"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span>${t.progressLabel}</span>
+                        <span class="days-left-highlight">${data.daysLeft} ${t.daysLeft} ${nextSeasonName}</span>
+                    </div>
+                </div>
+                
+                <div class="next-label">${t.nextLabel}</div>
+                ${upcomingHtml}
+            `;
+            
+            resultDisplay.innerHTML = html;
+        }
+
+        function updateUILanguage() {
+            const t = i18n[currentLang];
+            mainTitle.textContent = t.title;
+            cycleDesc.textContent = t.cycle;
+            warningText.textContent = t.warning;
+            dayInput.placeholder = t.placeholder;
+            copyLinkBtn.innerHTML = t.copyBtn;
+            langToggle.textContent = currentLang === 'es' ? 'EN' : 'ES';
+            
+            const dia = parseInt(dayInput.value, 10);
+            if (!isNaN(dia) && dia > 0) {
+                render(dia);
+            } else {
+                resultDisplay.innerHTML = `<div class="empty-state">${t.emptyState}</div>`;
+            }
+        }
+
+        function applyTheme(isDark) {
+            if (isDark) { bodyEl.classList.add('dark'); themeToggle.textContent = '☀️'; }
+            else { bodyEl.classList.remove('dark'); themeToggle.textContent = '🌙'; }
+            localStorage.setItem('dstSeasonTheme', isDark ? 'dark' : 'light');
+        }
+
+        function toggleTheme() { applyTheme(!bodyEl.classList.contains('dark')); }
+
+        function init() {
+            // Tema
+            const savedTheme = localStorage.getItem('dstSeasonTheme') || 'light';
+            applyTheme(savedTheme === 'dark');
+            
+            // Idioma
+            const savedLang = localStorage.getItem('dstSeasonLang') || 'es';
+            currentLang = savedLang;
+            updateUILanguage();
+            
+            // Limpiar campo y resultado siempre
+            dayInput.value = '';
+            const t = i18n[currentLang];
+            resultDisplay.innerHTML = `<div class="empty-state">${t.emptyState}</div>`;
+            
+            // Eventos
+            calcBtn.addEventListener('click', () => {
+                let d = parseInt(dayInput.value, 10);
+                if (isNaN(d) || d < 1) {
+                    dayInput.value = '';
+                    const t = i18n[currentLang];
+                    resultDisplay.innerHTML = `<div class="empty-state">${t.emptyState}</div>`;
+                    return;
+                }
+                dayInput.value = d;
+                render(d);
+            });
+            
+            dayInput.addEventListener('keypress', e => { if(e.key==='Enter') calcBtn.click(); });
+            themeToggle.addEventListener('click', toggleTheme);
+            langToggle.addEventListener('click', () => {
+                currentLang = currentLang === 'es' ? 'en' : 'es';
+                localStorage.setItem('dstSeasonLang', currentLang);
+                updateUILanguage();
+            });
+            
+            copyLinkBtn.addEventListener('click', () => {
+                const dia = dayInput.value;
+                if (!dia) {
+                    alert(currentLang === 'es' ? '⚠️ Introduce un día primero' : '⚠️ Enter a day first');
+                    return;
+                }
+                const url = new URL(window.location);
+                url.searchParams.set('dia', dia);
+                navigator.clipboard?.writeText(url.toString()).then(() => {
+                    alert(currentLang === 'es' ? '✅ Enlace copiado al portapapeles' : '✅ Link copied to clipboard');
+                }).catch(() => { prompt('📋 Copiar:', url.toString()); });
+            });
+        }
+        init();
+    })();
+</script>
+</body>
+</html>
